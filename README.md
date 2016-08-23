@@ -1,2 +1,2 @@
 # RNames
-R-code for RNames stratigraphic correlation schemes, PaleoDB/RNames match
+R-code for RNames stratigraphic correlation schemes & PaleoDB/RNames match
