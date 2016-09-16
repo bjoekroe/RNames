@@ -14,11 +14,6 @@ db.pw <- "xxx" ############ ---> insert you user password here
 db.db <- "rnames"
 rn.con <- dbConnect(m.drv, dbname = db.db, username = db.user, password = db.pw, host = db.url)
 
-
-dbGetQuery(rn.con," SET NAMES utf8")
-	reftab <- dbGetQuery(rn.con,"select * from reference ")
-on.exit(dbDisconnect(rn.con))
-
 Bergst_ts <- c("Camb", "Tr1", "Tr2", "Tr3", "Fl1", "Fl2", "Fl3", "Dp1", "Dp2", "Dp3", "Dw1", "Dw2", "Dw3", "Sa1", "Sa2", "Ka1", "Ka2", "Ka3", "Ka4", "Hi1", "Hi2", "Sil")
 names(Bergst_ts) <- 1:22
 Bergst_ts <- as.data.frame(Bergst_ts)
