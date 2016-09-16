@@ -13,9 +13,6 @@ library(RMySQL)
 source("/Users/bkroger/Documents/r/rnames/rname_finals/rname_functions.r");
 setwd("/Users/bkroger/Documents/r/rnames/rname_finals/");
 
-rn.con <- dbConnect(m.drv, dbname = db.db, username = db.user, password = db.pw, host = db.url)
-dbGetQuery(rn.con," SET NAMES utf8")
-
 ##############################################################
 ### Rule 1: Direct relations between names with Biostratigraphy Qualifiers (short: bio*) and Stage Slices (Webby et al. 2004) (short: TS*) are selected with compromise.selector()
 ### Rules 1 and 2 create temp_opinions_a file in RNames
