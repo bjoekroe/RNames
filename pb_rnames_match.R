@@ -12,7 +12,6 @@ library(gdata)
 source("/Users/bkroger/Documents/r/rnames/rname_finals/rname_functions.r");
 setwd("/Users/bkroger/Documents/r/rnames/rname_finals/");
 
-
 ###########################
 #### select time resolution 
 selection <- "b" ## b - bergström stage slices, c - chronostrat. stages, w - webby time slices
