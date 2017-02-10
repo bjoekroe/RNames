@@ -66,6 +66,9 @@ colnames(bio.sel) <- c("name", "oldest", "youngest", "tscount", "refs");
 		
 for (i in 1:lele) {
 		bio_set <- subset(ebios, ebios$name_1 == ele[i])
+			bio_out <- subset(bio_set, bio_set$name_2 == "not specified")
+      			refout <- unique(bio_out$reference_id)
+      			bio_set <- subset(bio_set, !(bio_set$reference_id %in% refout))
 		i.n <- as.character(ele[i])
 		u.ref <- unique(bio_set$reference_id)
 		rle <- length(u.ref)
@@ -122,7 +125,10 @@ youngest.selector <- function (ts_used, name_table_to_ts) {
   colnames(bio.sel) <- c("name", "oldest", "youngest", "tscount", "refs");
   
   for (i in 1:lele) {
-    bio_set <- subset(ebios, ebios$name_1 == ele[i]) # test use 6, or 4, or 68
+    bio_set <- subset(ebios, ebios$name_1 == ele[i])
+	  bio_out <- subset(bio_set, bio_set$name_2 == "not specified")
+      	  refout <- unique(bio_out$reference_id)
+      	  bio_set <- subset(bio_set, !(bio_set$reference_id %in% refout))
     i.n <- as.character(ele[i])
     i.d <- as.vector(strsplit(as.character(bio_set$reference_id), " "))
     i.d <- as.data.table(i.d)
