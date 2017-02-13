@@ -21,6 +21,18 @@ rule_id <- 1
 rn.con <- dbConnect(m.drv, dbname = db.db, username = db.user, password = db.pw, host = db.url)
 dbGetQuery(rn.con," SET NAMES utf8")
 dbGetQuery(rn.con,"delete from temp_opinions_a")
+bio.try <- dbGetQuery(rn.con,"
+                        select r.reference_id, r.name_1, name_2
+                      from view_cron_relations r
+                      where r.strat_qualifier_1 = 'Biostratigraphy'
+                      and r.qualifier_name_2 = 'Stage'
+                      group by 1, 2
+                      order by 1, 2;
+                      ")
+bio.out <- subset(bio.try, bio.try$name_1 == "not specified"|bio.try$name_2 == "not specified")
+ref.out <- unique(bio.out$reference_id)
+name.out <- unique(rbind(bio.out$name_1, bio.out$name_2))
+name.out <- unique(name.out[name.out != "not specified"])
 
 bio.names <- dbGetQuery(rn.con,"
                         select r.reference_id, r.name_1, GROUP_CONCAT(r.name_2) name_2
@@ -32,10 +44,13 @@ bio.names <- dbGetQuery(rn.con,"
                         order by 1, 2;
                         ")
 
+out.1 <- bio.names[grepl(paste(ref.out, collapse="|"), bio.names$reference_id), ]
+out.2 <- out.1[grepl(paste(name.out, collapse="|"), out.1$name_1), ]
+if (length(ref.out)>0) {bio.names <- bio.names[!(out.2$reference_id==bio.names$reference_id),]}
+
+
 ### We select all unique name_1 values and loop them to find out the related time slices and references for them
 bio.names.unique <- as.matrix(unique(bio.names$name_1))
-
-
 
 if (length(bio.names.unique) > 0){
   for (i in 1:NROW(bio.names.unique)){
@@ -55,6 +70,19 @@ rule_id <- 2;
 rn.con <- dbConnect(m.drv, dbname = db.db, username = db.user, password = db.pw, host = db.url)
 dbGetQuery(rn.con," SET NAMES utf8")
 
+bio.try <- dbGetQuery(rn.con,"
+                      select r.reference_id, r.name_1, name_2
+                      from view_cron_relations r
+                      where r.strat_qualifier_1 = 'Biostratigraphy'
+                      and r.strat_qualifier_2 = 'Biostratigraphy'
+                      group by 1, 2
+                      order by 1, 2;
+                      ")
+bio.out <- subset(bio.try, bio.try$name_1 == "not specified"|bio.try$name_2 == "not specified")
+ref.out <- unique(bio.out$reference_id)
+name.out <- unique(rbind(bio.out$name_1, bio.out$name_2))
+name.out <- unique(name.out[name.out != "not specified"])
+
 repeat
 {
   bio.names <- dbGetQuery(rn.con,"
@@ -69,6 +97,10 @@ repeat
                           group by 1, 2
                           order by 1, 2;
                           ")
+    out.1 <- bio.names[grepl(paste(ref.out, collapse="|"), bio.names$reference_id), ]
+    out.2 <- out.1[grepl(paste(name.out, collapse="|"), out.1$name_1), ]
+    if (length(ref.out)>0) {bio.names <- bio.names[!(out.2$reference_id==bio.names$reference_id),]}
+  
   if (NROW(bio.names) == 0)
   {
     print("No more relations!");
@@ -98,6 +130,19 @@ rn.con <- dbConnect(m.drv, dbname = db.db, username = db.user, password = db.pw,
 dbGetQuery(rn.con,"delete from temp_opinions_b")
 dbGetQuery(rn.con," SET NAMES utf8")
 
+bio.try <- dbGetQuery(rn.con,"
+                      select r.reference_id, r.name_1, name_2
+                      from view_cron_relations r
+                      where r.strat_qualifier_1 != 'Biostratigraphy'
+                      and r.qualifier_name_2 = 'Stage'
+                      group by 1, 2
+                      order by 1, 2;
+                      ")
+bio.out <- subset(bio.try, bio.try$name_1 == "not specified"|bio.try$name_2 == "not specified")
+ref.out <- unique(bio.out$reference_id)
+name.out <- unique(rbind(bio.out$name_1, bio.out$name_2))
+name.out <- unique(name.out[name.out != "not specified"])
+
 bio.names <- dbGetQuery(rn.con,"
                         select r.reference_id, r.name_1, GROUP_CONCAT(r.name_2) name_2
                         from view_cron_relations r
@@ -108,6 +153,10 @@ bio.names <- dbGetQuery(rn.con,"
                         group by 1, 2
                         order by 1, 2;
                         ")
+
+  out.1 <- bio.names[grepl(paste(ref.out, collapse="|"), bio.names$reference_id), ]
+  out.2 <- out.1[grepl(paste(name.out, collapse="|"), out.1$name_1), ]
+  if (length(ref.out)>0) {bio.names <- bio.names[!(out.2$reference_id==bio.names$reference_id),]}
 
 bio.names.unique <- as.matrix(unique(bio.names$name_1))
 
@@ -131,6 +180,21 @@ rn.con <- dbConnect(m.drv, dbname = db.db, username = db.user, password = db.pw,
 dbGetQuery(rn.con,"delete from temp_opinions_c")
 dbGetQuery(rn.con," SET NAMES utf8")
 
+bio.try <- dbGetQuery(rn.con,"
+                      select r.reference_id, r.name_1, name_2
+                      from view_cron_relations r
+                      where r.strat_qualifier_1 != 'Biostratigraphy'
+                      and r.strat_qualifier_2 = 'Biostratigraphy'
+                      and r.qualifier_name_1 != 'Stage'
+                      group by 1, 2
+                      order by 1, 2;
+                      ")
+
+bio.out <- subset(bio.try, bio.try$name_1 == "not specified"|bio.try$name_2 == "not specified")
+ref.out <- unique(bio.out$reference_id)
+name.out <- unique(rbind(bio.out$name_1, bio.out$name_2))
+name.out <- unique(name.out[name.out != "not specified"])
+
 bio.names <- dbGetQuery(rn.con,"
                         select r.reference_id, r.name_1, concat(GROUP_CONCAT(bio.`youngest`),',',GROUP_CONCAT(bio.`oldest`)) name_2
                         from view_cron_relations r
@@ -141,6 +205,10 @@ bio.names <- dbGetQuery(rn.con,"
                         and r.qualifier_name_1 != 'Stage'
                         group by 1, 2;
                         ")
+  out.1 <- bio.names[grepl(paste(ref.out, collapse="|"), bio.names$reference_id), ]
+  out.2 <- out.1[grepl(paste(name.out, collapse="|"), out.1$name_1), ]
+  if (length(ref.out)>0) {bio.names <- bio.names[!(out.2$reference_id==bio.names$reference_id),]}
+  bio.names.unique <- as.matrix(unique(bio.names$name_1))
 
 bio.names.unique <- as.matrix(unique(bio.names$name_1))
 
@@ -163,6 +231,21 @@ rule_id <- 5
 rn.con <- dbConnect(m.drv, dbname = db.db, username = db.user, password = db.pw, host = db.url)
 dbGetQuery(rn.con,"delete from temp_opinions_d")
 dbGetQuery(rn.con," SET NAMES utf8")
+
+bio.try <- dbGetQuery(rn.con,"
+                      select r.reference_id, r.name_1, name_2
+                      from view_cron_relations r
+                      where r.strat_qualifier_1 != 'Biostratigraphy'
+                      and r.strat_qualifier_1 != 'Chronostratigraphy'
+                      and r.strat_qualifier_2 != 'Biostratigraphy'
+                      and r.qualifier_name_1 != 'Stage'
+                      group by 1, 2
+                      order by 1, 2;
+                      ")
+bio.out <- subset(bio.try, bio.try$name_1 == "not specified"|bio.try$name_2 == "not specified")
+ref.out <- unique(bio.out$reference_id)
+name.out <- unique(rbind(bio.out$name_1, bio.out$name_2))
+name.out <- unique(name.out[name.out != "not specified"])
 
 bio.names_a <- dbGetQuery(rn.con,"
                         select r.reference_id, r.name_1, concat(GROUP_CONCAT(nme.oldest), ',', GROUP_CONCAT(nme.youngest)) name_2
@@ -194,6 +277,10 @@ bio.names_b <- dbGetQuery(rn.con,"
 
 bio.names <- rbind(bio.names_b, bio.names_a)
 
+  out.1 <- bio.names[grepl(paste(ref.out, collapse="|"), bio.names$reference_id), ]
+  out.2 <- out.1[grepl(paste(name.out, collapse="|"), out.1$name_1), ]
+  if (length(ref.out)>0) {bio.names <- bio.names[!(out.2$reference_id==bio.names$reference_id),]}
+
 bio.names.unique <- as.matrix(unique(bio.names$name_1))
 
 if (length(bio.names.unique) > 0){
@@ -220,6 +307,10 @@ repeat
                           and r.`name_1` not in (select name from temp_opinions_d)
                           group by 1, 2;
                           ")
+    out.1 <- bio.names[grepl(paste(ref.out, collapse="|"), bio.names$reference_id), ]
+  out.2 <- out.1[grepl(paste(name.out, collapse="|"), out.1$name_1), ]
+  if (length(ref.out)>0) {bio.names <- bio.names[!(out.2$reference_id==bio.names$reference_id),]}
+  
   if (NROW(bio.names) == 0)
   {
     print("No more relations!");
@@ -275,8 +366,12 @@ bio.names_b <- dbGetQuery(rn.con,"
                           order by 1, 2
                           ")
 bio.names <- rbind(bio.names_b, bio.names_a)
-bio.names.unique <- as.matrix(unique(bio.names$name_1))
 
+  out.1 <- bio.names[grepl(paste(ref.out, collapse="|"), bio.names$reference_id), ]
+  out.2 <- out.1[grepl(paste(name.out, collapse="|"), out.1$name_1), ]
+  if (length(ref.out)>0) {bio.names <- bio.names[!(out.2$reference_id==bio.names$reference_id),]}
+
+bio.names.unique <- as.matrix(unique(bio.names$name_1))
 
 if (length(bio.names.unique) > 0){
   for (i in 1:NROW(bio.names.unique)){
@@ -301,6 +396,13 @@ repeat
                           and r.`name_1` not in (select name from temp_opinions_e)
                           group by 1, 2;
                           ")
+  
+    out.1 <- bio.names[grepl(paste(ref.out, collapse="|"), bio.names$reference_id), ]
+    out.2 <- out.1[grepl(paste(name.out, collapse="|"), out.1$name_1), ]
+    if (length(ref.out)>0) {bio.names <- bio.names[!(out.2$reference_id==bio.names$reference_id),]}
+  
+  bio.names.unique <- as.matrix(unique(bio.names$name_1))
+  
   if (NROW(bio.names) == 0)
   {
     print("No more relations!");
