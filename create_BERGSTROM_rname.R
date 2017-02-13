@@ -213,7 +213,6 @@ out.2 <- out.1[grepl(paste(name.out, collapse="|"), out.1$name_1), ]
 if (length(ref.out)>0) {bio.names <- bio.names[!(out.2$reference_id==bio.names$reference_id),]}
 bio.names.unique <- as.matrix(unique(bio.names$name_1))
 
-
 if (length(bio.names.unique) > 0){
   for (i in 1:NROW(bio.names.unique)){
     result <- youngest.selector(ts_used = 'B', subset( bio.names, name_1 == bio.names.unique[i]))
@@ -282,8 +281,6 @@ out.2 <- out.1[grepl(paste(name.out, collapse="|"), out.1$name_1), ]
 if (length(ref.out)>0) {bio.names <- bio.names[!(out.2$reference_id==bio.names$reference_id),]}
 bio.names.unique <- as.matrix(unique(bio.names$name_1))
 
-bio.names.unique <- as.matrix(unique(bio.names$name_1))
-
 if (length(bio.names.unique) > 0){
   for (i in 1:NROW(bio.names.unique)){
     result <- youngest.selector(ts_used = 'B', subset( bio.names, name_1 == bio.names.unique[i]))
@@ -308,6 +305,10 @@ repeat
                           and r.`name_1` not in (select name from temp_opinions_d)
                           group by 1, 2;
                           ")
+  out.1 <- bio.names[grepl(paste(ref.out, collapse="|"), bio.names$reference_id), ]
+  out.2 <- out.1[grepl(paste(name.out, collapse="|"), out.1$name_1), ]
+  if (length(ref.out)>0) {bio.names <- bio.names[!(out.2$reference_id==bio.names$reference_id),]}
+
   if (NROW(bio.names) == 0)
   {
     print("No more relations!");
@@ -368,8 +369,6 @@ out.1 <- bio.names[grepl(paste(ref.out, collapse="|"), bio.names$reference_id), 
 out.2 <- out.1[grepl(paste(name.out, collapse="|"), out.1$name_1), ]
 if (length(ref.out)>0) {bio.names <- bio.names[!(out.2$reference_id==bio.names$reference_id),]}
 bio.names.unique <- as.matrix(unique(bio.names$name_1))
-bio.names.unique <- as.matrix(unique(bio.names$name_1))
-
 
 if (length(bio.names.unique) > 0){
   for (i in 1:NROW(bio.names.unique)){
@@ -394,6 +393,10 @@ repeat
                           and r.`name_1` not in (select name from temp_opinions_e)
                           group by 1, 2;
                           ")
+    out.1 <- bio.names[grepl(paste(ref.out, collapse="|"), bio.names$reference_id), ]
+    out.2 <- out.1[grepl(paste(name.out, collapse="|"), out.1$name_1), ]
+    if (length(ref.out)>0) {bio.names <- bio.names[!(out.2$reference_id==bio.names$reference_id),]}
+  
   if (NROW(bio.names) == 0)
   {
     print("No more relations!");
